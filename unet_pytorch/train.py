@@ -96,6 +96,18 @@ def main():
         train_fn(train_loader, model, optimizer, loss_fn, scaler)
 
         # save model
+        checkpoint = {
+            "state_dict": model.state_dict(),
+            "optimizer": optimizer.state_dict(),
+        }
+        save_checkpoint(checkpoint)
+
+        # check accuracy
+        check_accuracy(val_loader, model, device=DEVICE)
+
+        save_predictions_as_imgs(
+            val_loader, model, folder="saved_images/", device=DEVICE
+        )
         # check accuracy
         # print some examples to a folder
 
