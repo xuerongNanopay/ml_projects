@@ -30,15 +30,19 @@ class RNN(nn.Module):
         self.num_layers = num_layers
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
 
-        self.fc = nn.Linear(hidden_size*sequence_length, num_classes)
+        # self.fc = nn.Linear(hidden_size*sequence_length, num_classes)
+        # Just using the last hidden state
+        self.fc = nn.Linear(hidden_size, num_classes)
+
 
     def forward(self, x):
         h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device)
-        c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size)
+        c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device)
 
         # Forward Prop
         out, _ = self.lstm(x, (h0, c0))
-        out = out.reshape(out.shape[0], -1)
+        # out = out.reshape(out.shape[0], -1)
+        out = out[:, -1, :]
         out = self.fc(out)
         return out
 
