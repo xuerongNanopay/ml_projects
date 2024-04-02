@@ -23,6 +23,7 @@ class RNN(nn.Module):
         RNN model for MNIST.
         This is just an example of implementation of the RNN Net.
         MNIST may not make sense for RNN.
+        It is a many to many model.
     """
     def __init__(self, input_size, hidden_size, num_layers, num_classes):
         super(RNN, self).__init__()
