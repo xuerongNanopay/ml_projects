@@ -35,4 +35,4 @@ model = LeNet()
 print(model(x).shape)
 
 if __name__ == "__main__":
-    print("LeNet Done")
+    print("🇨🇦LeNet Done")

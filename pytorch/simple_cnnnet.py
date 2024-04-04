@@ -97,4 +97,4 @@ for epoch in range(num_epochs):
 # Check accuracy on training & test to see how good our model.
 
 if __name__ == "__main__":
-    print("CNN Done")
+    print("🇨🇦CNN Done")

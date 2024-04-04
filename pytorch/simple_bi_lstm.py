@@ -97,4 +97,4 @@ for epoch in range(num_epochs):
 
 
 if __name__ == "__main__":
-    print("dBiLSTM Done")
+    print("🇨🇦dBiLSTM Done")

@@ -101,4 +101,4 @@ for epoch in range(num_epochs):
     check_accuracy(test_loader, model)
 
 if __name__ == "__main__":
-    print("RNN Done")
+    print("🇨🇦RNN Done")
