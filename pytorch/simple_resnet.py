@@ -29,6 +29,7 @@ class Block(nn.Module):
         if self.identity_downsample is not None:
             identity = self.identity_downsample(identity)
 
+        # Element-wise addition.
         x += identity
         x = self.relu(x)
         return x
