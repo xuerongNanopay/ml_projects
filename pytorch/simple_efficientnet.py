@@ -170,7 +170,7 @@ def test():
     version = "b0"
     phi, res, drop_rate = phi_values[version]
     num_examples, num_classes = 4, 10
-    x = torch.randn((num_examples, 3, res, res))
+    x = torch.randn((num_examples, 3, res, res)).to(device)
     model = EfficientNet(
         version=version,
         num_classes=num_classes
