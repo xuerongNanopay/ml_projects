@@ -3,11 +3,54 @@ import pandas as pd
 import spacy
 import torch
 from torch.nn.utils.rnn import pad_sequence
-import torch.utils.data as Dataset
 from PIL import Image
+from torch.utils.data import Dataset, DataLoader
+import torchvision.transforms as transforms
 
 START_TOKEN = "<SOS>"
 END_TOKEN = "<EOS>"
+PAD_TOKEN = "<PAD>"
+UNKNOWN_TOKEN = "<UNK>"
+
+
+spacy_eng = spacy.load("en_core_web_sm")
+
+class Vocabulary:
+    def __init__(self, freq_threshold):
+        self.itos = {
+            0: PAD_TOKEN, 1: START_TOKEN, 2: END_TOKEN, 3: UNKNOWN_TOKEN
+        }
+        self.stoi = {
+            PAD_TOKEN: 0, START_TOKEN: 1, END_TOKEN: 2, UNKNOWN_TOKEN: 3
+        }
+        self.freq_threshold = freq_threshold
+
+    def __len__(self):
+        return len(self.itos)
+
+    @staticmethod
+    def tokenizer_eng(test):
+        return [tok.text.lower() for tok in spacy_eng.tokenizer(test)]
+
+    def build_vocabulary(self, sentences):
+        frequencies = {}
+        idx = 4
+        for sentence in sentences:
+            for word in self.tokenizer_eng(sentence):
+                if word not in frequencies:
+                    frequencies[word] = 1
+                else:
+                    frequencies[word] += 1
+
+                if frequencies[word] > self.freq_threshold:
+                    self.stoi[word] = idx
+                    self.itos[idx] = word
+                    idx += 1
+
+    def numericalize(self, text):
+        tokenized_text = self.tokenizer_eng(text)
+        return [self.stoi[token] if token in self.stoi else self.stoi[UNKNOWN_TOKEN]
+                for token in tokenized_text]
 
 
 class Flickr8k(Dataset):
@@ -25,7 +68,7 @@ class Flickr8k(Dataset):
 
         # Initialize vocabulary and build vocab
         self.vocab = Vocabulary(freq_threshold)
-        self.vocab.build_vocabulary(self.captions.tolst())
+        self.vocab.build_vocabulary(self.captions.tolist())
 
     def __len__(self):
         return len(self.df)
@@ -40,8 +83,60 @@ class Flickr8k(Dataset):
 
         num_caption = [self.vocab.stoi[START_TOKEN]]
         num_caption += self.vocab.numericalize(caption)
-        num_caption += self.vocab.stoi[END_TOKEN]
+        num_caption.append(self.vocab.stoi[END_TOKEN])
         return image, torch.tensor(num_caption)
+
+
+class MyCollate:
+    def __init__(self, pad_idx):
+        self.pad_idx = pad_idx
+
+    def __call__(self, batch):
+        images = [item[0].unsqueeze(0) for item in batch]
+        images = torch.cat(images, dim=0)
+        targets = [item[1] for item in batch]
+        targets = pad_sequence(targets, batch_first=True, padding_value=self.pad_idx)
+
+        return images, targets
+
+
+def get_loader(
+        root_dir,
+        annotation_file,
+        transform,
+        batch_size=32,
+        num_workers=8,
+        shuffle=True,
+        pin_memory=True,
+):
+    dataset = Flickr8k(root_dir, annotation_file, transform=transform)
+    pad_idx = dataset.vocab.stoi[PAD_TOKEN]
+    loader = DataLoader(
+        dataset=dataset,
+        batch_size=batch_size,
+        num_workers=num_workers,
+        shuffle=shuffle,
+        pin_memory=pin_memory,
+        collate_fn=MyCollate(pad_idx)
+    )
+
+    return loader
+
+
+def test_dataloader():
+    transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor()
+    ])
+    dataloader = get_loader(
+        root_dir="../dataset/Flickr8k/images/",
+        annotation_file="../dataset/Flickr8k/captions.txt",
+        transform=transform,
+    )
+
+    for idx, (imgs, captions) in enumerate(dataloader):
+        print(imgs.shape)
+        print(captions.shape)
 
 
 def test_captions_file(file="../dataset/Flickr8k/captions.txt"):
@@ -52,4 +147,6 @@ def test_captions_file(file="../dataset/Flickr8k/captions.txt"):
 
 
 if __name__ == "__main__":
-    test_captions_file()
+    # test_captions_file
+    test_dataloader()
+    print("🇨🇦Flickr Dataset Done")
