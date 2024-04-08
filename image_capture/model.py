@@ -6,7 +6,9 @@ class EncoderCNN(nn.Module):
     def __init__(self, embed_size, train_CNN=False):
         super(EncoderCNN, self).__init__()
         self.train_CNN = train_CNN
-        self.inception = models.inception_v3(pretrained=True, aux_logits=False)
+        self.inception = models.inception_v3(weights=models.Inception_V3_Weights.DEFAULT)
+        self.inception.aux_logits = False
+        self.inception.AuxLogits = None
         self.inception.fc = nn.Linear(self.inception.fc.in_features, embed_size)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(0.5)
@@ -72,5 +74,3 @@ class CNNtoRNN(nn.Module):
         return [vocabulary.itos[idx] for idx in result_capture]
 
 
-def test():
-    model = CNNtoRNN(50, 100, 1000, 2)
