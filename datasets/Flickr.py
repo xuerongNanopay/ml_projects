@@ -11,6 +11,8 @@ START_TOKEN = "<SOS>"
 END_TOKEN = "<EOS>"
 PAD_TOKEN = "<PAD>"
 UNKNOWN_TOKEN = "<UNK>"
+DEFAULT_ROOT_DIR = "../dataset/Flickr8k/images/"
+DEFAULT_ANNOTATIONS_DIR = "../dataset/Flickr8k/captions.txt"
 
 
 spacy_eng = spacy.load("en_core_web_sm")
@@ -101,9 +103,9 @@ class MyCollate:
 
 
 def get_loader(
-        root_dir,
-        annotation_file,
-        transform,
+        root_dir=DEFAULT_ROOT_DIR,
+        annotation_file=DEFAULT_ANNOTATIONS_DIR,
+        transform=None,
         batch_size=32,
         num_workers=8,
         shuffle=True,
@@ -120,7 +122,7 @@ def get_loader(
         collate_fn=MyCollate(pad_idx)
     )
 
-    return loader
+    return loader, dataset
 
 
 def test_dataloader():
@@ -128,14 +130,12 @@ def test_dataloader():
         transforms.Resize((224, 224)),
         transforms.ToTensor()
     ])
-    dataloader = get_loader(
-        root_dir="../dataset/Flickr8k/images/",
-        annotation_file="../dataset/Flickr8k/captions.txt",
+    dataloader, _ = get_loader(
         transform=transform,
     )
 
-    for idx, (imgs, captions) in enumerate(dataloader):
-        print(imgs.shape)
+    for idx, (images, captions) in enumerate(dataloader):
+        print(images.shape)
         print(captions.shape)
 
 
