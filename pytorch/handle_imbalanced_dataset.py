@@ -35,7 +35,7 @@ def get_loader(root_dir, batch_size):
     return loader
 
 def main():
-    loader = get_loader(root_dir='dataset/cat_and_dog', batch_size=8)
+    loader = get_loader(root_dir='../dataset/cat_and_dog', batch_size=8)
 
     for data, lables in loader:
         print(lables)

@@ -27,7 +27,7 @@ def plot_examples(images):
 # image = cv2.imread('dataset/images/cat.jpg')
 # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-image = Image.open('dataset/images/cat.jpg')
+image = Image.open('../dataset/images/cat.jpg')
 
 transform = A.Compose(
     [

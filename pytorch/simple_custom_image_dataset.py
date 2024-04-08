@@ -54,7 +54,7 @@ transform = A.Compose(
     ]
 )
 
-dataset = ImageFolder(root_dir="dataset/cat_and_dog/", transform=transform)
+dataset = ImageFolder(root_dir="../dataset/cat_and_dog/", transform=transform)
 
 for x, y in dataset:
     print(x.shape)
