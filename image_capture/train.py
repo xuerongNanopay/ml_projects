@@ -66,7 +66,7 @@ def train():
         for idx, (images, captions) in enumerate(train_loader):
             images = images.to(device)
             captions = captions.to(device)
-            # print('vvv', images)
+            # print('vvv', playground_images)
             # why -1? First Sequence will be input from Encoder
             outputs = model(images, captions[:-1])
             loss = criterion(outputs.reshape(-1, outputs.shape[2]), captions.reshape(-1))
