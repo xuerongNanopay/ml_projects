@@ -25,7 +25,7 @@ def train():
     train_loader, dataset = get_loader(transform=transform)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     load_model = False
-    save_model = False
+    save_model = True
 
     # Hyperparameters.
     embed_size = 256
