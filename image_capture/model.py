@@ -7,8 +7,13 @@ class EncoderCNN(nn.Module):
         super(EncoderCNN, self).__init__()
         self.train_CNN = train_CNN
         self.inception = models.inception_v3(weights=models.Inception_V3_Weights.DEFAULT)
+
+        # Why do this? I believe bug at here:
+        # see https://github.com/pytorch/vision/blob/5181a854d8b127cf465cd22a67c1b5aaf6ccae05/torchvision/models/inception.py#L466
+        # _ovewrite_named_param throw error if aux_logits is False.
         self.inception.aux_logits = False
         self.inception.AuxLogits = None
+
         self.inception.fc = nn.Linear(self.inception.fc.in_features, embed_size)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(0.5)
@@ -36,7 +41,8 @@ class DecoderRNN(nn.Module):
     # features: Nx1000, N*S
     def forward(self, features, captions):
         embeddings = self.dropout(self.embed(captions))
-        embeddings = torch.cat((features.unsqueeze(0), embeddings), dim=0)
+        print('ffff', embeddings.shape, features.shape, features.unsqueeze(0).shape)
+        embeddings = torch.cat((features.unsqueeze(1), embeddings), dim=1)
         hiddens, _ = self.lstm(embeddings)
         outputs = self.linear(hiddens)
         return outputs
