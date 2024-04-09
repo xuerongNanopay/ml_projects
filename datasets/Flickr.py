@@ -1,3 +1,7 @@
+"""
+    Flickr dataset
+    Sequence First Dataset
+"""
 import os
 import pandas as pd
 import spacy
@@ -97,7 +101,7 @@ class MyCollate:
         images = [item[0].unsqueeze(0) for item in batch]
         images = torch.cat(images, dim=0)
         targets = [item[1] for item in batch]
-        targets = pad_sequence(targets, batch_first=True, padding_value=self.pad_idx)
+        targets = pad_sequence(targets, batch_first=False, padding_value=self.pad_idx)
 
         return images, targets
 

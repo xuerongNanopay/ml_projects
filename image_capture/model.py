@@ -41,8 +41,7 @@ class DecoderRNN(nn.Module):
     # features: Nx1000, N*S
     def forward(self, features, captions):
         embeddings = self.dropout(self.embed(captions))
-        print('ffff', embeddings.shape, features.shape, features.unsqueeze(0).shape)
-        embeddings = torch.cat((features.unsqueeze(1), embeddings), dim=1)
+        embeddings = torch.cat((features.unsqueeze(0), embeddings), dim=0)
         hiddens, _ = self.lstm(embeddings)
         outputs = self.linear(hiddens)
         return outputs

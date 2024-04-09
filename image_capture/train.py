@@ -62,17 +62,17 @@ def train():
 
             save_checkpoint(checkpoint, "my_checkpoint.pth.tar")
 
+        # captions is Sequence First
         for idx, (images, captions) in enumerate(train_loader):
             images = images.to(device)
             captions = captions.to(device)
             # print('vvv', images)
-            # why -1?
-            print('sss', images.shape, captions.shape)
-            outputs = model(images, captions[:, :-1])
-            print('fff', outputs.shape)
+            # why -1? First Sequence will be input from Encoder
+            outputs = model(images, captions[:-1])
             loss = criterion(outputs.reshape(-1, outputs.shape[2]), captions.reshape(-1))
-            print("loss: ", loss)
             # writer.add_scalar("loss", loss.item(), global_step=step)
+
+            print(f"loss: {loss.item():.4f}")
             step += 1
 
             optimizer.zero_grad()
@@ -82,3 +82,4 @@ def train():
 
 if __name__ == "__main__":
     train()
+    print("🇨🇦Done")
