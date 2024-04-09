@@ -24,7 +24,7 @@ def train():
 
     train_loader, dataset = get_loader(transform=transform)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    load_model = False
+    load_model = True
     save_model = True
 
     # Hyperparameters.
@@ -49,18 +49,10 @@ def train():
 
     if load_model:
         step = load_checkpoint("my_checkpoint.pth.tar", model, optimizer)
-
+        print(f"step: {step}")
     model.train()
 
     for epoch in range(num_epochs):
-        if save_model:
-            checkpoint = {
-                "state_dict": model.state_dict(),
-                "optimizer": optimizer.state_dict(),
-                "step": step
-            }
-
-            save_checkpoint(checkpoint, "my_checkpoint.pth.tar")
 
         # captions is Sequence First
         for idx, (images, captions) in enumerate(train_loader):
@@ -78,6 +70,15 @@ def train():
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+
+        if save_model:
+            checkpoint = {
+                "state_dict": model.state_dict(),
+                "optimizer": optimizer.state_dict(),
+                "step": step
+            }
+
+            save_checkpoint(checkpoint, "my_checkpoint.pth.tar")
 
 
 if __name__ == "__main__":
